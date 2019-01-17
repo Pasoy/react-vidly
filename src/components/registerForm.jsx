@@ -3,10 +3,11 @@ import Joi from 'joi-browser';
 
 import Form from './common/form';
 
-class LoginForm extends Form {
+class RegisterForm extends Form {
     state = {
         data: {
             username: '',
+            email: '',
             password: ''
         },
         errors: {}
@@ -16,8 +17,13 @@ class LoginForm extends Form {
         username: Joi.string()
             .label('Username')
             .required(),
+        email: Joi.string()
+            .label('Email')
+            .email()
+            .required(),
         password: Joi.string()
             .label('Password')
+            .min(6)
             .required()
     };
 
@@ -29,15 +35,16 @@ class LoginForm extends Form {
     render() {
         return (
             <div>
-                <h1>Login</h1>
+                <h1>Register</h1>
                 <form onSubmit={this.handleSubmit}>
+                    {this.renderInput('email', 'Email')}
                     {this.renderInput('username', 'Username')}
                     {this.renderInput('password', 'Password', 'password')}
-                    {this.renderButton('Login')}
+                    {this.renderButton('Register')}
                 </form>
             </div>
         );
     }
 }
 
-export default LoginForm;
+export default RegisterForm;
