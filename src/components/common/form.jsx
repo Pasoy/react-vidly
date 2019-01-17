@@ -5,7 +5,10 @@ import Input from './input';
 import Select from './select';
 
 class Form extends Component {
-    state = { data: {}, errors: {} };
+    state = {
+        data: {},
+        errors: {}
+    };
 
     validate = () => {
         const options = { abortEarly: false };
@@ -16,6 +19,7 @@ class Form extends Component {
         }
 
         const errors = {};
+
         for (let item of error.details) {
             errors[item.path[0]] = item.message;
         }
@@ -36,7 +40,10 @@ class Form extends Component {
 
         const errors = this.validate();
         this.setState({ errors: errors || {} });
-        if (errors) return;
+
+        if (errors) {
+            return;
+        }
 
         this.doSubmit();
     };
@@ -44,6 +51,7 @@ class Form extends Component {
     handleChange = ({ currentTarget: input }) => {
         const errors = { ...this.state.errors };
         const errorMessage = this.validateProperty(input);
+
         if (errorMessage) {
             errors[input.name] = errorMessage;
         } else {
@@ -52,10 +60,8 @@ class Form extends Component {
 
         const data = { ...this.state.data };
         data[input.name] = input.value;
-        this.setState({
-            data,
-            errors
-        });
+
+        this.setState({ data, errors });
     };
 
     renderButton(label) {
@@ -66,32 +72,32 @@ class Form extends Component {
         );
     }
 
-    renderInput(name, label, type = 'text') {
-        const { data, errors } = this.state;
-
-        return (
-            <Input
-                name={name}
-                value={data[name]}
-                label={label}
-                error={errors[name]}
-                type={type}
-                onChange={this.handleChange}
-            />
-        );
-    }
-
     renderSelect(name, label, options) {
         const { data, errors } = this.state;
 
         return (
             <Select
                 name={name}
-                label={label}
                 value={data[name]}
+                label={label}
                 options={options}
-                error={errors[name]}
                 onChange={this.handleChange}
+                error={errors[name]}
+            />
+        );
+    }
+
+    renderInput(name, label, type = 'text') {
+        const { data, errors } = this.state;
+
+        return (
+            <Input
+                type={type}
+                name={name}
+                value={data[name]}
+                label={label}
+                onChange={this.handleChange}
+                error={errors[name]}
             />
         );
     }
