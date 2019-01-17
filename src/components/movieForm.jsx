@@ -1,17 +1,94 @@
 import React from 'react';
+import Joi from 'joi-browser';
 
-const MovieForm = ({ match, history }) => {
-    return (
-        <div>
-            <h1>Movie Form {match.params.id}</h1>
-            <button
-                className="btn btn-primary"
-                onClick={() => history.push('/movies')}
-            >
-                Save
-            </button>
-        </div>
-    );
-};
+import Form from './common/form';
+
+import { getMovie, saveMovie } from '../services/fakeMovieService';
+import { getGenres } from '../services/fakeGenreService';
+
+class MovieForm extends Form {
+    state = {
+        data: {
+            title: '',
+            genreId: '',
+            numberInStock: '',
+            dailyRentalRate: ''
+        },
+        genres: [],
+        errors: {}
+    };
+
+    schema = {
+        _id: Joi.string(),
+        title: Joi.string()
+            .label('Title')
+            .required(),
+        genreId: Joi.string()
+            .label('Genre')
+            .required(),
+        numberInStock: Joi.number()
+            .label('Number in Stock')
+            .min(0)
+            .max(100)
+            .required(),
+        dailyRentalRate: Joi.number()
+            .label('Daily Rental Rate')
+            .min(0)
+            .max(20)
+            .required()
+    };
+
+    componentDidMount() {
+        const genres = getGenres();
+        this.setState({ genres });
+
+        const movieId = this.props.match.params.id;
+        if (movieId === 'new') {
+            return;
+        }
+
+        const movie = getMovie(movieId);
+        if (!movie) {
+            return this.props.history.replace('/404');
+        }
+
+        this.setState({ data: this.mapToViewModel(movie) });
+    }
+
+    mapToViewModel(movie) {
+        return {
+            _id: movie._id,
+            title: movie.title,
+            genreId: movie.genreId,
+            numberInStock: movie.numberInStock,
+            dailyRentalRate: movie.dailyRentalRate
+        };
+    }
+
+    doSubmit = () => {
+        saveMovie(this.state.data);
+
+        this.props.history.push('/movies');
+    };
+
+    render() {
+        return (
+            <div>
+                <h1>Movie Form</h1>
+                <form onSubmit={this.handleSubmit}>
+                    {this.renderInput('title', 'Title')}
+                    {this.renderSelect('genreId', 'Genre', this.state.genres)}
+                    {this.renderInput(
+                        'numberInStock',
+                        'Number in Stock',
+                        'number'
+                    )}
+                    {this.renderInput('dailyRentalRate', 'Rate')}
+                    {this.renderButton('Save')}
+                </form>
+            </div>
+        );
+    }
+}
 
 export default MovieForm;
