@@ -3,6 +3,8 @@ import Joi from 'joi-browser';
 
 import Form from './common/form';
 
+import { register } from '../services/userService';
+
 class RegisterForm extends Form {
     state = {
         data: {
@@ -27,9 +29,9 @@ class RegisterForm extends Form {
             .required()
     };
 
-    doSubmit = () => {
+    doSubmit = async () => {
         // Server stuff
-        console.log('Submit button pressed');
+        await register(this.state.data);
     };
 
     render() {
